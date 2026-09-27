@@ -124,7 +124,6 @@ código-fonte em [`docs/der.dbml`](docs/der.dbml).
 | Artefato | Arquivo |
 |---|---|
 | Levantamento e priorização de requisitos (MoSCoW) | [`docs/requisitos.md`](docs/requisitos.md) |
-| Diagrama entidade-relacionamento | [`docs/der.png`](docs/der.png) |
 | Diagrama entidade-relacionamento | [`docs/der.png`](docs/der.png) · fonte em [`docs/der.dbml`](docs/der.dbml) |
 | Diagrama de classes | [`docs/diagrama-classes.md`](docs/diagrama-classes.md) |
 | Protótipo de telas | [`docs/wireframes/`](docs/wireframes/) |
