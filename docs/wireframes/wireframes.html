@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JobTrack — Protótipo de telas</title>
+<style>
+  :root{
+    --paper:#FFFFFF;
+    --canvas:#E9ECEF;
+    --ink:#1F2933;
+    --graphite:#7B8794;
+    --rule:#C3CAD2;
+    --fill:#E4E8EC;
+    --annot:#2B6CB0;
+    --alert:#9B2C2C;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--canvas);
+    font-family:var(--sans);
+    color:var(--ink);
+    padding:32px 24px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sheet{
+    width:1120px;
+    margin:0 auto 48px;
+    background:var(--paper);
+    border:1px solid var(--rule);
+  }
+
+  /* ---------- bloco de título ---------- */
+  .titleblock{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:24px;
+    padding:18px 28px;
+    border-bottom:1px solid var(--rule);
+  }
+  .tb-name{font-size:15px;font-weight:600;letter-spacing:-0.01em}
+  .tb-meta{font-size:12.5px;color:var(--graphite)}
+
+  /* ---------- moldura do desenho ---------- */
+  .frame{padding:28px;background:#F6F7F9}
+  .screen{
+    background:var(--paper);
+    border:1px solid var(--rule);
+    overflow:hidden;
+  }
+
+  /* ---------- primitivas de wireframe ---------- */
+  .bar{background:var(--fill);border-radius:2px;height:9px;display:inline-block;vertical-align:middle}
+  .bar.tall{height:12px}
+  .box{border:1px solid var(--rule);border-radius:3px}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    border:1px solid var(--graphite);border-radius:3px;
+    padding:8px 14px;font-size:12.5px;color:var(--ink);background:var(--paper);
+  }
+  .btn.solid{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .btn.sm{padding:5px 10px;font-size:11.5px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:11.5px;color:var(--graphite);margin-bottom:5px}
+  .input{
+    border:1px solid var(--rule);border-radius:3px;background:var(--paper);
+    height:34px;display:flex;align-items:center;padding:0 10px;
+  }
+  .input.err{border-color:var(--alert);border-width:1.5px}
+  .input.area{height:72px;align-items:flex-start;padding-top:9px}
+  .badge{
+    display:inline-block;border:1px solid var(--graphite);border-radius:10px;
+    padding:2px 9px;font-size:10.5px;color:var(--ink);
+  }
+  .chip{
+    display:inline-block;border:1px solid var(--rule);background:var(--fill);
+    border-radius:3px;padding:3px 9px;font-size:11px;margin-right:6px;
+  }
+
+  /* marcador de anotação */
+  .m{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:17px;height:17px;border-radius:50%;
+    background:var(--annot);color:#fff;
+    font-size:10.5px;font-weight:700;
+    vertical-align:middle;margin-left:6px;flex:none;
+  }
+
+  /* ---------- barra superior da aplicação ---------- */
+  .appbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:13px 20px;border-bottom:1px solid var(--rule);background:#FAFBFC;
+  }
+  .brand{font-size:14px;font-weight:700;letter-spacing:-0.02em}
+  .appnav{display:flex;align-items:center;gap:22px;font-size:12.5px;color:var(--graphite)}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--fill);border:1px solid var(--rule)}
+
+  /* ---------- painel de contadores ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:20px}
+  .stat{border:1px solid var(--rule);border-radius:3px;padding:14px 16px}
+  .stat .num{font-size:26px;font-weight:700;letter-spacing:-0.03em;line-height:1}
+  .stat .lbl{font-size:11.5px;color:var(--graphite);margin-top:6px}
+
+  /* ---------- barra de ferramentas ---------- */
+  .toolbar{
+    display:flex;align-items:center;gap:12px;
+    padding:0 20px 18px;
+  }
+  .search{flex:1;max-width:330px}
+  .select{width:172px}
+  .spacer{flex:1}
+
+  /* ---------- tabela ---------- */
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead th{
+    text-align:left;font-size:11px;font-weight:600;color:var(--graphite);
+    padding:10px 20px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+    background:#FAFBFC;
+  }
+  tbody td{padding:13px 20px;border-bottom:1px solid #E8EBEE;vertical-align:middle}
+  .pager{display:flex;justify-content:flex-end;gap:6px;padding:16px 20px}
+  .pg{
+    width:26px;height:26px;border:1px solid var(--rule);border-radius:3px;
+    display:flex;align-items:center;justify-content:center;font-size:11.5px;color:var(--graphite);
+  }
+  .pg.on{border-color:var(--ink);color:var(--ink);font-weight:600}
+
+  /* ---------- detalhe ---------- */
+  .crumb{padding:14px 20px 0;font-size:11.5px;color:var(--graphite)}
+  .dethead{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:24px;
+    padding:12px 20px 18px;border-bottom:1px solid var(--rule);
+  }
+  .dethead h2{font-size:19px;font-weight:700;letter-spacing:-0.02em;margin-bottom:7px}
+  .detsub{font-size:12.5px;color:var(--graphite)}
+  .cols{display:grid;grid-template-columns:1fr 340px;gap:0}
+  .colmain{padding:20px;border-right:1px solid var(--rule)}
+  .colside{padding:20px}
+  .sechead{
+    display:flex;align-items:center;justify-content:space-between;
+    font-size:13px;font-weight:600;margin-bottom:13px;
+  }
+  .step{display:flex;gap:13px;padding-bottom:16px}
+  .steprail{display:flex;flex-direction:column;align-items:center;flex:none;width:12px;padding-top:4px}
+  .dot{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--graphite);background:var(--paper)}
+  .line{width:1px;flex:1;background:var(--rule);margin-top:4px;min-height:26px}
+  .stepbody{flex:1}
+  .steptop{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+  .steptitle{font-size:12.5px;font-weight:600}
+  .stepdate{font-size:11px;color:var(--graphite)}
+  .file{
+    display:flex;align-items:center;gap:11px;
+    border:1px solid var(--rule);border-radius:3px;padding:10px 12px;margin-bottom:9px;
+  }
+  .fileicon{width:26px;height:32px;border:1px solid var(--graphite);border-radius:2px;flex:none}
+  .drop{
+    border:1.5px dashed var(--rule);border-radius:3px;
+    padding:18px;text-align:center;font-size:11.5px;color:var(--graphite);
+  }
+  .warn{
+    border:1px solid var(--graphite);border-left:3px solid var(--ink);
+    border-radius:2px;padding:10px 13px;font-size:11.5px;margin-bottom:18px;
+  }
+
+  /* ---------- formulário ---------- */
+  .form{padding:20px;max-width:720px}
+  .formhead{font-size:19px;font-weight:700;letter-spacing:-0.02em;margin-bottom:18px}
+  .errbox{
+    border:1px solid var(--alert);border-left:3px solid var(--alert);border-radius:2px;
+    padding:12px 14px;margin-bottom:20px;
+  }
+  .errbox .t{font-size:12.5px;font-weight:600;color:var(--alert);margin-bottom:6px}
+  .errbox ul{margin-left:16px;font-size:11.5px;color:var(--alert)}
+  .errmsg{font-size:11px;color:var(--alert);margin-top:5px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .radios{display:flex;gap:18px;align-items:center;height:34px}
+  .radio{display:flex;align-items:center;gap:7px;font-size:12px}
+  .rdot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--graphite)}
+  .rdot.on{border-color:var(--ink);border-width:4px}
+  .actions{display:flex;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--rule)}
+
+  /* ---------- legenda de anotações ---------- */
+  .key{padding:20px 28px 24px;border-top:1px solid var(--rule)}
+  .key h3{font-size:11.5px;font-weight:600;color:var(--graphite);margin-bottom:12px}
+  .key ol{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:9px 32px}
+  .key li{display:flex;gap:9px;font-size:12px;line-height:1.45}
+  .knum{
+    flex:none;width:17px;height:17px;border-radius:50%;
+    background:var(--annot);color:#fff;font-size:10.5px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;margin-top:1px;
+  }
+  .kmod{color:var(--graphite)}
+</style>
+</head>
+<body>
+
+<!-- ============================ TELA 01 ============================ -->
+<section class="sheet" id="tela-01">
+  <div class="titleblock">
+    <div class="tb-name">Tela 01 — Listagem de candidaturas</div>
+    <div class="tb-meta">GET /candidaturas &nbsp;·&nbsp; acesso restrito a usuário autenticado</div>
+  </div>
+
+  <div class="frame">
+    <div class="screen">
+      <div class="appbar">
+        <div class="brand">JobTrack</div>
+        <div class="appnav">
+          <span>Candidaturas</span>
+          <span>Tecnologias</span>
+          <div class="avatar"></div>
+          <span>Sair</span>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="num">12</div><div class="lbl">Enviadas <span class="m">3</span></div></div>
+        <div class="stat"><div class="num">5</div><div class="lbl">Em andamento</div></div>
+        <div class="stat"><div class="num">2</div><div class="lbl">Aprovadas</div></div>
+        <div class="stat"><div class="num">7</div><div class="lbl">Sem retorno</div></div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search">
+          <div class="input"><span style="font-size:12px;color:var(--graphite)">Buscar por empresa ou cargo</span><span class="m">1</span></div>
+        </div>
+        <div class="select">
+          <div class="input"><span style="font-size:12px;color:var(--graphite)">Status: todos</span><span class="m">2</span></div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn solid">Nova candidatura</div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Empresa</th><th>Cargo</th><th>Modalidade</th>
+            <th>Enviada em</th><th>Status</th><th style="text-align:right">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="bar tall" style="width:118px"></span></td>
+            <td><span class="bar" style="width:136px"></span></td>
+            <td><span class="bar" style="width:62px"></span></td>
+            <td><span class="bar" style="width:70px"></span></td>
+            <td><span class="badge">Em andamento</span><span class="m">4</span></td>
+            <td style="text-align:right"><span class="btn sm">Ver</span></td>
+          </tr>
+          <tr>
+            <td><span class="bar tall" style="width:96px"></span></td>
+            <td><span class="bar" style="width:152px"></span></td>
+            <td><span class="bar" style="width:52px"></span></td>
+            <td><span class="bar" style="width:70px"></span></td>
+            <td><span class="badge">Enviada</span></td>
+            <td style="text-align:right"><span class="btn sm">Ver</span></td>
+          </tr>
+          <tr>
+            <td><span class="bar tall" style="width:132px"></span></td>
+            <td><span class="bar" style="width:108px"></span></td>
+            <td><span class="bar" style="width:66px"></span></td>
+            <td><span class="bar" style="width:70px"></span></td>
+            <td><span class="badge">Aprovada</span></td>
+            <td style="text-align:right"><span class="btn sm">Ver</span><span class="m">5</span></td>
+          </tr>
+          <tr>
+            <td><span class="bar tall" style="width:104px"></span></td>
+            <td><span class="bar" style="width:124px"></span></td>
+            <td><span class="bar" style="width:58px"></span></td>
+            <td><span class="bar" style="width:70px"></span></td>
+            <td><span class="badge">Sem retorno</span></td>
+            <td style="text-align:right"><span class="btn sm">Ver</span></td>
+          </tr>
+          <tr>
+            <td><span class="bar tall" style="width:126px"></span></td>
+            <td><span class="bar" style="width:142px"></span></td>
+            <td><span class="bar" style="width:62px"></span></td>
+            <td><span class="bar" style="width:70px"></span></td>
+            <td><span class="badge">Reprovada</span></td>
+            <td style="text-align:right"><span class="btn sm">Ver</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pager">
+        <div class="pg">‹</div><div class="pg on">1</div><div class="pg">2</div><div class="pg">3</div><div class="pg">›</div>
+        <span class="m">6</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="key">
+    <h3>Legenda</h3>
+    <ol>
+      <li><span class="knum">1</span><span>Busca por empresa ou cargo. A consulta fica isolada no método <b>search</b> do Model, coberto por teste unitário. <span class="kmod">RF12 · módulo 10</span></span></li>
+      <li><span class="knum">2</span><span>Filtro por status, combinável com a busca. <span class="kmod">RF13</span></span></li>
+      <li><span class="knum">3</span><span>Painel com a contagem de candidaturas por status. <span class="kmod">RF14 · módulos 5 e 6</span></span></li>
+      <li><span class="knum">4</span><span>Badge de status como componente Blade reutilizável, com parâmetro. <span class="kmod">módulo 5</span></span></li>
+      <li><span class="knum">5</span><span>A listagem traz apenas as candidaturas do usuário autenticado. <span class="kmod">RNF01 · módulo 11</span></span></li>
+      <li><span class="knum">6</span><span>Paginação nativa do Eloquent. <span class="kmod">módulo 9</span></span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================ TELA 02 ============================ -->
+<section class="sheet" id="tela-02">
+  <div class="titleblock">
+    <div class="tb-name">Tela 02 — Detalhe da candidatura</div>
+    <div class="tb-meta">GET /candidaturas/{candidatura} &nbsp;·&nbsp; autorização via CandidaturaPolicy</div>
+  </div>
+
+  <div class="frame">
+    <div class="screen">
+      <div class="appbar">
+        <div class="brand">JobTrack</div>
+        <div class="appnav">
+          <span>Candidaturas</span><span>Tecnologias</span>
+          <div class="avatar"></div><span>Sair</span>
+        </div>
+      </div>
+
+      <div class="crumb">Candidaturas › Detalhe</div>
+
+      <div class="dethead">
+        <div>
+          <h2>Nome da empresa — Cargo da vaga</h2>
+          <div class="detsub">Remoto · Enviada em 12/09/2026 · <span style="text-decoration:underline">Link da vaga</span></div>
+          <div style="margin-top:11px">
+            <span class="chip">Laravel</span><span class="chip">PHP</span><span class="chip">MySQL</span><span class="m">6</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:9px;align-items:center;flex:none">
+          <span class="badge">Em andamento</span>
+          <span class="btn sm">Editar</span>
+          <span class="btn sm">Excluir</span>
+          <span class="m">1</span>
+        </div>
+      </div>
+
+      <div class="cols">
+        <div class="colmain">
+          <div class="warn">Sem atualização há 18 dias. Considere registrar um contato de acompanhamento. <span class="m">7</span></div>
+
+          <div class="sechead">
+            <span>Etapas do processo <span class="m">2</span></span>
+            <span class="btn sm">Registrar etapa</span>
+          </div>
+
+          <div class="step">
+            <div class="steprail"><div class="dot"></div><div class="line"></div></div>
+            <div class="stepbody">
+              <div class="steptop">
+                <span class="steptitle">Entrevista técnica</span>
+                <span class="badge">Pendente</span><span class="m">3</span>
+                <span class="stepdate">— 22/09/2026</span>
+              </div>
+              <span class="bar" style="width:74%"></span>
+              <span class="bar" style="width:46%;margin-top:6px"></span>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="steprail"><div class="dot"></div><div class="line"></div></div>
+            <div class="stepbody">
+              <div class="steptop">
+                <span class="steptitle">Teste técnico</span>
+                <span class="badge">Aprovado</span>
+                <span class="stepdate">— 15/09/2026</span>
+              </div>
+              <span class="bar" style="width:66%"></span>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="steprail"><div class="dot"></div></div>
+            <div class="stepbody">
+              <div class="steptop">
+                <span class="steptitle">Triagem</span>
+                <span class="badge">Aprovado</span>
+                <span class="stepdate">— 12/09/2026</span>
+              </div>
+              <span class="bar" style="width:58%"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="colside">
+          <div class="sechead"><span>Anexos <span class="m">4</span></span></div>
+
+          <div class="file">
+            <div class="fileicon"></div>
+            <div style="flex:1">
+              <span class="bar tall" style="width:120px"></span>
+              <div style="font-size:10.5px;color:var(--graphite);margin-top:5px">PDF · 340 KB</div>
+            </div>
+            <span class="btn sm">Baixar</span><span class="m">5</span>
+          </div>
+
+          <div class="file">
+            <div class="fileicon"></div>
+            <div style="flex:1">
+              <span class="bar tall" style="width:98px"></span>
+              <div style="font-size:10.5px;color:var(--graphite);margin-top:5px">PDF · 112 KB</div>
+            </div>
+            <span class="btn sm">Baixar</span>
+          </div>
+
+          <div class="drop">Arraste um arquivo ou clique para selecionar<br>PDF de até 2 MB</div>
+          <div style="margin-top:11px"><span class="btn">Enviar anexo</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="key">
+    <h3>Legenda</h3>
+    <ol>
+      <li><span class="knum">1</span><span>Editar e Excluir só aparecem para o dono do registro, via diretiva <b>@can</b> na view. <span class="kmod">RNF01 · módulo 11</span></span></li>
+      <li><span class="knum">2</span><span>Etapas do processo em ordem decrescente de data. Relacionamento 1-N com a candidatura. <span class="kmod">RF08 · módulo 9</span></span></li>
+      <li><span class="knum">3</span><span>Resultado da etapa em badge, com os valores pendente, aprovado, reprovado e sem retorno. <span class="kmod">módulo 5</span></span></li>
+      <li><span class="knum">4</span><span>Upload de anexos com validação de tipo e tamanho na classe de Request. <span class="kmod">RF09 · módulos 7 e 12</span></span></li>
+      <li><span class="knum">5</span><span>Download por rota controlada, já que os arquivos ficam fora do diretório público. <span class="kmod">RNF07 · módulo 12</span></span></li>
+      <li><span class="knum">6</span><span>Tecnologias da vaga. Relacionamento N-N via tabela pivô. <span class="kmod">RF11 · módulo 9</span></span></li>
+      <li><span class="knum">7</span><span>Aviso calculado pelo método <b>diasSemAtualizacao</b> a partir da última etapa registrada. <span class="kmod">RF16 · módulo 10</span></span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================ TELA 03 ============================ -->
+<section class="sheet" id="tela-03">
+  <div class="titleblock">
+    <div class="tb-name">Tela 03 — Cadastro de candidatura (estado com erro de validação)</div>
+    <div class="tb-meta">GET /candidaturas/create &nbsp;·&nbsp; POST /candidaturas</div>
+  </div>
+
+  <div class="frame">
+    <div class="screen">
+      <div class="appbar">
+        <div class="brand">JobTrack</div>
+        <div class="appnav">
+          <span>Candidaturas</span><span>Tecnologias</span>
+          <div class="avatar"></div><span>Sair</span>
+        </div>
+      </div>
+
+      <div class="form">
+        <div class="formhead">Nova candidatura</div>
+
+        <div class="errbox">
+          <div class="t">Não foi possível salvar. Corrija os campos abaixo.</div>
+          <ul>
+            <li>O campo empresa é obrigatório.</li>
+            <li>A data de envio não pode ser uma data futura.</li>
+          </ul>
+          <span class="m">2</span>
+        </div>
+
+        <div class="two">
+          <div class="field">
+            <label>Empresa *</label>
+            <div class="input err"></div>
+            <div class="errmsg">O campo empresa é obrigatório.</div>
+            <span class="m">1</span>
+          </div>
+          <div class="field">
+            <label>Cargo *</label>
+            <div class="input"><span class="bar" style="width:148px"></span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Link da vaga</label>
+          <div class="input"><span class="bar" style="width:290px"></span></div>
+        </div>
+
+        <div class="two">
+          <div class="field">
+            <label>Modalidade *</label>
+            <div class="radios">
+              <span class="radio"><span class="rdot"></span>Presencial</span>
+              <span class="radio"><span class="rdot"></span>Híbrido</span>
+              <span class="radio"><span class="rdot on"></span>Remoto</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Data de envio *</label>
+            <div class="input err"><span class="bar" style="width:76px"></span></div>
+            <div class="errmsg">A data de envio não pode ser uma data futura.</div>
+            <span class="m">3</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Status *</label>
+          <div class="input" style="max-width:300px"><span style="font-size:12px;color:var(--graphite)">Enviada</span></div>
+        </div>
+
+        <div class="field">
+          <label>Tecnologias</label>
+          <div class="input" style="height:auto;padding:8px 10px;flex-wrap:wrap;gap:0">
+            <span class="chip">Laravel</span><span class="chip">PHP</span><span class="chip">+ adicionar</span>
+          </div>
+          <span class="m">4</span>
+        </div>
+
+        <div class="field">
+          <label>Observações</label>
+          <div class="input area"><span class="bar" style="width:76%"></span></div>
+        </div>
+
+        <div class="actions">
+          <span class="btn solid">Salvar candidatura</span>
+          <span class="btn">Cancelar</span>
+          <span class="m">5</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="key">
+    <h3>Legenda</h3>
+    <ol>
+      <li><span class="knum">1</span><span>Erro exibido campo a campo. Os valores digitados voltam preenchidos pelo helper <b>old</b>. <span class="kmod">RNF02 · módulo 7</span></span></li>
+      <li><span class="knum">2</span><span>Resumo dos erros no topo do formulário, com mensagens traduzidas para o português. <span class="kmod">RNF03 · módulo 7</span></span></li>
+      <li><span class="knum">3</span><span>Regra de validação que impede data de envio futura, declarada na classe de Request. <span class="kmod">RF04 · módulo 7</span></span></li>
+      <li><span class="knum">4</span><span>Seleção de tecnologias gravada com <b>sync</b> no relacionamento N-N. <span class="kmod">RF11 · módulo 9</span></span></li>
+      <li><span class="knum">5</span><span>Envio por rota POST nomeada, com token CSRF e redirecionamento após o sucesso. <span class="kmod">módulo 4</span></span></li>
+    </ol>
+  </div>
+</section>
+
+</body>
+</html>

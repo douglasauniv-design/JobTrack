@@ -1,0 +1,152 @@
+// ============================================================
+// JobTrack — Modelo de dados
+// Disciplina TSI35D — Desenvolvimento de Aplicações Backend com Framework
+//
+// Cole este código em https://dbdiagram.io/d
+// Depois: Export > PNG, e salve como docs/der.png
+// ============================================================
+
+Project JobTrack {
+  database_type: 'MySQL'
+  note: 'Acompanhamento de candidaturas a vagas de emprego e estágio'
+}
+
+// ------------------------------------------------------------
+// Enums
+// ------------------------------------------------------------
+
+enum candidatura_modalidade {
+  presencial
+  hibrido
+  remoto
+}
+
+enum candidatura_status {
+  enviada          [note: 'Currículo enviado, sem retorno ainda']
+  em_andamento     [note: 'Processo seletivo em curso']
+  aprovada
+  reprovada
+  sem_retorno      [note: 'Empresa não deu resposta']
+}
+
+enum etapa_tipo {
+  triagem
+  teste_tecnico
+  entrevista_rh
+  entrevista_tecnica
+  entrevista_final
+  proposta
+  outro
+}
+
+enum etapa_resultado {
+  pendente
+  aprovado
+  reprovado
+  sem_retorno
+}
+
+// ------------------------------------------------------------
+// Tabelas
+// ------------------------------------------------------------
+
+Table users {
+  id bigint [pk, increment]
+  name varchar(255) [not null]
+  email varchar(255) [not null, unique]
+  email_verified_at timestamp [null]
+  password varchar(255) [not null]
+  remember_token varchar(100) [null]
+  created_at timestamp
+  updated_at timestamp
+
+  note: 'Usuário do sistema. Tabela padrão do Laravel.'
+}
+
+Table candidaturas {
+  id bigint [pk, increment]
+  user_id bigint [not null, note: 'Dono da candidatura — base da Policy']
+  empresa varchar(255) [not null]
+  cargo varchar(255) [not null]
+  link varchar(500) [null, note: 'URL da vaga']
+  modalidade candidatura_modalidade [not null]
+  data_envio date [not null]
+  status candidatura_status [not null, default: 'enviada']
+  observacoes text [null]
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    (user_id, status) [name: 'idx_candidaturas_user_status']
+  }
+
+  note: 'Candidatura a uma vaga. Pertence a um único usuário.'
+}
+
+Table etapas {
+  id bigint [pk, increment]
+  candidatura_id bigint [not null]
+  tipo etapa_tipo [not null]
+  data date [not null]
+  resultado etapa_resultado [not null, default: 'pendente']
+  anotacoes text [null]
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    candidatura_id [name: 'idx_etapas_candidatura']
+  }
+
+  note: 'Etapa do processo seletivo. Uma candidatura possui várias etapas, ordenadas por data.'
+}
+
+Table anexos {
+  id bigint [pk, increment]
+  candidatura_id bigint [not null]
+  nome_original varchar(255) [not null, note: 'Nome do arquivo enviado pelo usuário']
+  caminho varchar(500) [not null, note: 'Caminho no storage privado']
+  mime_type varchar(100) [not null]
+  tamanho integer [not null, note: 'Tamanho em bytes']
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    candidatura_id [name: 'idx_anexos_candidatura']
+  }
+
+  note: 'Documento enviado na candidatura (currículo, carta de apresentação).'
+}
+
+Table tecnologias {
+  id bigint [pk, increment]
+  nome varchar(100) [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+
+  note: 'Tecnologia exigida pela vaga. Compartilhada entre candidaturas.'
+}
+
+Table candidatura_tecnologia {
+  id bigint [pk, increment]
+  candidatura_id bigint [not null]
+  tecnologia_id bigint [not null]
+
+  indexes {
+    (candidatura_id, tecnologia_id) [unique, name: 'idx_candidatura_tecnologia_unico']
+  }
+
+  note: 'Tabela pivô do relacionamento N-N entre candidaturas e tecnologias.'
+}
+
+// ------------------------------------------------------------
+// Relacionamentos
+// ------------------------------------------------------------
+
+// 1-N
+Ref: candidaturas.user_id > users.id [delete: cascade]
+Ref: etapas.candidatura_id > candidaturas.id [delete: cascade]
+Ref: anexos.candidatura_id > candidaturas.id [delete: cascade]
+
+// N-N (via tabela pivô)
+Ref: candidatura_tecnologia.candidatura_id > candidaturas.id [delete: cascade]
+Ref: candidatura_tecnologia.tecnologia_id > tecnologias.id [delete: cascade]
