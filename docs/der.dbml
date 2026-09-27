@@ -1,11 +1,3 @@
-// ============================================================
-// JobTrack — Modelo de dados
-// Disciplina TSI35D — Desenvolvimento de Aplicações Backend com Framework
-//
-// Cole este código em https://dbdiagram.io/d
-// Depois: Export > PNG, e salve como docs/der.png
-// ============================================================
-
 Project JobTrack {
   database_type: 'MySQL'
   note: 'Acompanhamento de candidaturas a vagas de emprego e estágio'
